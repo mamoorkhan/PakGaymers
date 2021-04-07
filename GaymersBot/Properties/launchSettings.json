@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "GaymersBot": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "local"
+      }
+    }
+  }
+}
