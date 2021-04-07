@@ -7,7 +7,22 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
+
+variables:
+  azureSubscription: '<AZURE SUBSCRIPTION>'    
+  
+  buildPlatform: 'Any CPU'
+  buildConfiguration: '<Debug|Release|...>'
+  
+  solution: '<PATH TO SOLUTION FILE (.sln)>'
+  webJobsProjectName: '<WEBJOBS PROJECT NAME>'
+  webJobsName: '<WEBJOBS NAME (AS DEFINED ON AZURE WEB INTERFACE)>'
+  webAppName: '<WEB APP NAME ON AZURE>'  
+  
+  ftpServerUrl: 'ftp://<AZURE FTP URL>'
+  ftpUsername: '<AZURE FTP USERNAME>'
+  ftpPassword: '<AZURE FTP PASSWORD>'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -21,7 +36,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/*.csproj'
-    arguments: '--output $(Build.BinariesDirectory)/publish_output/App_Data/jobs/continuous/GaymersBot'
+    arguments: '--output $(Build.BinariesDirectory)/publish_output/App_Data/jobs/continuous/PakGaymers'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -31,3 +46,31 @@ steps:
     ArtifactName: 'drop'
     publishLocation: 'Container'
 
+- task: AzureAppServiceManage@0
+  displayName: 'WebJob: stop'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    Action: 'Stop all continuous webjobs'
+    WebAppName: $(webAppName) 
+
+- task: FtpUpload@2
+  displayName: 'WebJob: publish'
+  inputs:    
+    credentialsOption: 'inputs'
+    serverUrl: $(ftpServerUrl)
+    username: $(ftpUsername)
+    password: $(ftpPassword)
+    rootDirectory: '$(build.SourcesDirectory)/src/$(webJobsProjectName)/bin/$(buildConfiguration)/'
+    filePatterns: '**'
+    remoteDirectory: '/site/jobs/continuous/$(webJobsName)/'
+    clean: false
+    cleanContents: false
+    preservePaths: true
+    trustSSL: false
+
+- task: AzureAppServiceManage@0
+  displayName: 'WebJob: start'
+  inputs:
+    azureSubscription: $(azureSubscription)
+    Action: 'Start all continuous webjobs'
+    WebAppName: $(webAppName)  
