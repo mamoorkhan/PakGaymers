@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -14,11 +13,14 @@ namespace GaymersBot.Services
         private readonly CommandService _commands;
         private readonly DiscordSocketClient _client;
 
-        public CommandHandlingService(IServiceProvider services)
+        public CommandHandlingService(
+            IServiceProvider services,
+            CommandService commands,
+            DiscordSocketClient client)
         {
             _services = services;
-            _commands = services.GetRequiredService<CommandService>();
-            _client = services.GetRequiredService<DiscordSocketClient>();
+            _commands = commands;
+            _client = client;
             _commands.CommandExecuted += OnCommandExecutedAsync;
             _client.MessageReceived += HandleCommandAsync;
             _client.MessageUpdated += MessageUpdatedAsync;

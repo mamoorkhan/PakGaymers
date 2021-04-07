@@ -2,6 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 using GaymersBot.Services;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,6 +28,8 @@ namespace GaymersBot
 
             Console.WriteLine("This is the whey!");
 
+            ConfigureConfiguration();
+
             var builder = new HostBuilder();
             builder.ConfigureWebJobs(b =>
             {
@@ -41,18 +44,7 @@ namespace GaymersBot
 
             builder.ConfigureServices(async (context, s) =>
             {
-                ConfigureServices(s);
-
-                var token = Configuration["Token"];
-                _client.Log += LogAsync;
-                await _client.LoginAsync(TokenType.Bot, token);
-                await _client.StartAsync();
-
-                s.AddSingleton(_client)
-                .AddSingleton(_commands)
-                .AddSingleton<LoggingService>()
-                .AddSingleton<CommandHandlingService>()
-                .BuildServiceProvider();
+                await ConfigureServices(s);
             });
 
             builder.ConfigureLogging(logging =>
@@ -63,16 +55,25 @@ namespace GaymersBot
                     // This uses the options callback to explicitly set the instrumentation key.
                     logging.AddApplicationInsights(appInsightsKey)
                         .SetMinimumLevel(LogLevel.Information);
-                    logging.AddApplicationInsightsWebJobs(o => { o.InstrumentationKey = appInsightsKey; });
+
+                    logging.AddApplicationInsightsWebJobs(o =>
+                    {
+                        o.InstrumentationKey = appInsightsKey;
+                    });
                 }
             });
 
             var tokenSource = new CancellationTokenSource();
             var ct = tokenSource.Token;
             var host = builder.Build();
+            //var services = host.Services;
+            //var commandHandlingService = services.GetService<CommandHandlingService>();
+            //if (commandHandlingService != null)
+            //{
+            //    await commandHandlingService.InitializeAsync();
+            //}
             using (host)
             {
-                //await host.Services.GetRequiredService<CommandHandlingService>().InitializeAsync();
                 await host.RunAsync(ct);
                 tokenSource.Dispose();
             }
@@ -85,7 +86,26 @@ namespace GaymersBot
             return Task.CompletedTask;
         }
 
-        private static void ConfigureServices(IServiceCollection services)
+        private static async Task ConfigureServices(IServiceCollection services)
+        {
+            var token = Configuration["Token"];
+            _client.Log += LogAsync;
+            await _client.LoginAsync(TokenType.Bot, token);
+            await _client.StartAsync();
+
+            var sp = services.AddMemoryCache()
+                .AddSingleton(Configuration)
+                .AddSingleton(_client)
+                .AddSingleton(_commands)
+                .AddSingleton<LoggingService>()
+                .AddSingleton<CommandHandlingService>()
+                .AddSingleton<IJobActivator, JobActivator>()
+                .BuildServiceProvider();
+
+            await sp.GetRequiredService<CommandHandlingService>().InitializeAsync();
+        }
+
+        private static void ConfigureConfiguration()
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -95,9 +115,6 @@ namespace GaymersBot
                 .AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables() //this doesn't do anything useful notice im setting some env variables explicitly.
                 .Build();  //build it so you can use those config variables down below.
-
-            services.AddMemoryCache(); //I'm using MemCache in some other classes
-            services.AddSingleton(Configuration);
         }
     }
 }
