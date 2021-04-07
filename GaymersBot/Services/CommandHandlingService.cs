@@ -47,11 +47,6 @@ namespace GaymersBot.Services
 
             // the command failed, let's notify the user that something happened.
             await context.Channel.SendMessageAsync($"error: {result}");
-
-            //var commandName = command.IsSpecified ? command.Value.Name : "A command";
-            //await _log.LogAsync(new LogMessage(LogSeverity.Info,
-            //    "CommandExecution",
-            //    $"{commandName} was executed at {DateTime.UtcNow}."));
         }
 
         public async Task HandleCommandAsync(SocketMessage socketMessage)
@@ -86,10 +81,9 @@ namespace GaymersBot.Services
             Console.WriteLine($"{message} -> {after}");
         }
 
-        private static Task Ready()
+        private async Task Ready()
         {
-            Console.WriteLine("Bot is connected!");
-            return Task.CompletedTask;
+            await Task.Run(() => Console.WriteLine("Bot is connected!"));
         }
     }
 }
