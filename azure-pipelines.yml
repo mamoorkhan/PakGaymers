@@ -10,26 +10,21 @@ pool:
   vmImage: windows-latest
 
 variables:
-  azureSubscription: '<AZURE SUBSCRIPTION>'    
+  azureSubscription: 'PakGaymers'
   
   buildPlatform: 'Any CPU'
-  buildConfiguration: '<Debug|Release|...>'
+  buildConfiguration: 'Release'
   
-  solution: '<PATH TO SOLUTION FILE (.sln)>'
-  webJobsProjectName: '<WEBJOBS PROJECT NAME>'
-  webJobsName: '<WEBJOBS NAME (AS DEFINED ON AZURE WEB INTERFACE)>'
-  webAppName: '<WEB APP NAME ON AZURE>'  
-  
-  ftpServerUrl: 'ftp://<AZURE FTP URL>'
-  ftpUsername: '<AZURE FTP USERNAME>'
-  ftpPassword: '<AZURE FTP PASSWORD>'
+  webJobsProjectName: 'PakGaymers'
+  webJobsName: 'PakGaymers'
+  webAppName: 'PakGaymers'
 
 steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: '**/*.csproj'
-    arguments: '--configuration Release'
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   inputs:
