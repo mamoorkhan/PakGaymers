@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GaymersBot.Services
+namespace PakGaymers.Services
 {
     public class LoggingService
     {

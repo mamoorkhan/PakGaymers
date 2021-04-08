@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PakGaymers", "PakGaymers\PakGaymers.csproj", "{A91A53F9-C6DB-4DE8-A78B-3C678522D968}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PakGaymers", "PakGaymers\PakGaymers.csproj", "{A91A53F9-C6DB-4DE8-A78B-3C678522D968}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PakGaymers.Data.Table", "PakGaymers.Data.Table\PakGaymers.Data.Table.csproj", "{51D0567E-1AA8-433F-A684-6AE91CDEF51A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{A91A53F9-C6DB-4DE8-A78B-3C678522D968}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A91A53F9-C6DB-4DE8-A78B-3C678522D968}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A91A53F9-C6DB-4DE8-A78B-3C678522D968}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51D0567E-1AA8-433F-A684-6AE91CDEF51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51D0567E-1AA8-433F-A684-6AE91CDEF51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51D0567E-1AA8-433F-A684-6AE91CDEF51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51D0567E-1AA8-433F-A684-6AE91CDEF51A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

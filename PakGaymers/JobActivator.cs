@@ -1,7 +1,7 @@
 ﻿using Microsoft.Azure.WebJobs.Host;
 using System;
 
-namespace GaymersBot
+namespace PakGaymers
 {
     public class JobActivator : IJobActivator
     {

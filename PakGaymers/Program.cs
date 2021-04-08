@@ -1,18 +1,19 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using GaymersBot.Services;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PakGaymers.Data.Table;
+using PakGaymers.Services;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace GaymersBot
+namespace PakGaymers
 {
     internal class Program
     {
@@ -44,7 +45,8 @@ namespace GaymersBot
 
             builder.ConfigureServices(async (context, s) =>
             {
-                await ConfigureServices(s);
+                var services = await ConfigureServices(s);
+                await services.GetRequiredService<CommandHandlingService>().InitializeAsync();
             });
 
             builder.ConfigureLogging(logging =>
@@ -66,12 +68,6 @@ namespace GaymersBot
             var tokenSource = new CancellationTokenSource();
             var ct = tokenSource.Token;
             var host = builder.Build();
-            //var services = host.Services;
-            //var commandHandlingService = services.GetService<CommandHandlingService>();
-            //if (commandHandlingService != null)
-            //{
-            //    await commandHandlingService.InitializeAsync();
-            //}
             using (host)
             {
                 await host.RunAsync(ct);
@@ -86,23 +82,28 @@ namespace GaymersBot
             return Task.CompletedTask;
         }
 
-        private static async Task ConfigureServices(IServiceCollection services)
+        private static async Task<IServiceProvider> ConfigureServices(IServiceCollection services)
         {
             var token = Configuration["Token"];
             _client.Log += LogAsync;
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
-            var sp = services.AddMemoryCache()
+
+
+
+            return services
+                .AddMemoryCache()
+                .AddSingleton<ILoggerFactory, LoggerFactory>()
+                .AddSingleton(ServiceDescriptor.Describe(typeof(ILogger<>), typeof(Logger<>), ServiceLifetime.Singleton))
                 .AddSingleton(Configuration)
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
+                .AddSingleton<ITableStorage, AzureTableStorage>()
                 .AddSingleton<LoggingService>()
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<IJobActivator, JobActivator>()
                 .BuildServiceProvider();
-
-            await sp.GetRequiredService<CommandHandlingService>().InitializeAsync();
         }
 
         private static void ConfigureConfiguration()
