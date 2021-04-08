@@ -37,10 +37,6 @@ namespace PakGaymers
                 b.AddAzureStorageCoreServices();
                 b.AddAzureStorage();
                 b.AddTimers();
-                b.AddServiceBus(sbOptions =>
-                {
-                    sbOptions.ConnectionString = Configuration["AzureWebJobsServiceBus"];
-                });
             });
 
             builder.ConfigureServices(async (context, s) =>
@@ -88,9 +84,6 @@ namespace PakGaymers
             _client.Log += LogAsync;
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
-
-
-
 
             return services
                 .AddMemoryCache()

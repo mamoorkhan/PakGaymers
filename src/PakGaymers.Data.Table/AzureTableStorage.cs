@@ -19,7 +19,7 @@ namespace PakGaymers.Data.Table
             _logger = logger;
             try
             {
-                _storageAccount = CloudStorageAccount.Parse(configuration["Values:AzureWebJobsStorage"]);
+                _storageAccount = CloudStorageAccount.Parse(configuration["AzureWebJobsStorage"]);
             }
             catch (FormatException)
             {
