@@ -33,7 +33,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/*.csproj'
-    arguments: '--output $(Build.ArtifactStagingDirectory) --configration $(buildConfiguration)'
+    arguments: '--output $(Build.ArtifactStagingDirectory) --configuration $(buildConfiguration)'
     zipAfterPublish: false
     modifyOutputPath: false
 
